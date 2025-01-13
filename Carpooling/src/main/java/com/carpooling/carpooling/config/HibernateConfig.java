@@ -7,6 +7,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.JpaTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -15,23 +16,13 @@ import java.util.Properties;
 @PropertySource("classpath:application.properties")
 public class HibernateConfig {
 
-    private final String dbUrl, dbUsername,dbPassword;
-
+    private final String dbUrl, dbUsername, dbPassword;
 
     @Autowired
     public HibernateConfig(Environment env) {
-        dbUrl = env.getProperty("database.url");
-        dbUsername = env.getProperty("database.username");
-        dbPassword = env.getProperty("database.password");
-    }
-
-    @Bean
-    public LocalSessionFactoryBean sessionFactory(){
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-        sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan("com.carpooling.carpooling.models");
-        sessionFactory.setHibernateProperties(hibernateProperties());
-        return sessionFactory;
+        dbUrl = env.getProperty("spring.datasource.url");
+        dbUsername = env.getProperty("spring.datasource.username");
+        dbPassword = env.getProperty("spring.datasource.password");
     }
 
     @Bean
@@ -43,11 +34,28 @@ public class HibernateConfig {
         dataSource.setPassword(dbPassword);
         return dataSource;
     }
-    private Properties hibernateProperties(){
-        Properties hibernateProperties = new Properties();
-        hibernateProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.MariaDbDialect");
 
-        return hibernateProperties;
+    @Bean
+    public LocalSessionFactoryBean sessionFactory() {
+        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+        sessionFactory.setDataSource(dataSource());
+        sessionFactory.setPackagesToScan("com.carpooling.carpooling.models");
+        sessionFactory.setHibernateProperties(hibernateProperties());
+        return sessionFactory;
     }
 
+    @Bean
+    public JpaTransactionManager transactionManager() {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(sessionFactory().getObject());
+        return transactionManager;
+    }
+
+    private Properties hibernateProperties() {
+        Properties properties = new Properties();
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MariaDbDialect");
+        properties.setProperty("hibernate.show_sql", "true");
+        properties.setProperty("hibernate.format_sql", "true");
+        return properties;
+    }
 }

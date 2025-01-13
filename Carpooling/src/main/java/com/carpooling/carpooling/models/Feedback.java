@@ -11,15 +11,15 @@ public class Feedback {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "travel_id", nullable = false)
     private Travel travel;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "giver_id", nullable = false)
     private User giver;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "receiver_id",nullable = false)
     private User receiver;
 

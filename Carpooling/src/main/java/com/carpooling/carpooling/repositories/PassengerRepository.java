@@ -1,6 +1,7 @@
 package com.carpooling.carpooling.repositories;
 
 import com.carpooling.carpooling.models.Passenger;
+import com.carpooling.carpooling.models.Travel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,4 +11,5 @@ import java.util.List;
 public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     List<Passenger> findByTravelId(Long travelId);
     List<Passenger> findByUserId(Long userId);
+    List<Passenger> findByTravel(Travel travel);
 }

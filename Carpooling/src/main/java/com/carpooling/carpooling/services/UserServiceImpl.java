@@ -45,14 +45,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void create(User user) {
-        boolean dublicate = true;
-
-        try {
-            userRepository.findByUsername(user.getUsername());
-        }catch (EntityNotFoundException e){
-            dublicate = false;
+        if (user == null){
+            throw new IllegalArgumentException("User cannot be null");
         }
-        if (dublicate) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()){
             throw new EntityDuplicateException("User","username",user.getUsername());
         }
 
@@ -77,12 +73,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(int id) {
-        Long userId = (long) id;
-
-        if (!userRepository.existsById(userId)){
-            throw new IllegalArgumentException("User not found");
-        }
-        userRepository.deleteById(userId);
+    public void delete(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        userRepository.delete(user);
     }
 }

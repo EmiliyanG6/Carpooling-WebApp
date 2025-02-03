@@ -10,7 +10,7 @@ public interface UserService {
     User getUserById(long id);
     User get(String username);
     User getUserByEmail(String email);
-    void create(User user);
-    void update(User updatedUser);
-    void delete(String username);
+    User create(User user);
+    User update(long id, User updatedUser);
+    void delete(long id);
 }

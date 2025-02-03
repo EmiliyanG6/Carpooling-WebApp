@@ -4,11 +4,11 @@ import com.carpooling.carpooling.exceptions.EntityDuplicateException;
 import com.carpooling.carpooling.models.User;
 import com.carpooling.carpooling.repositories.UserRepository;
 import com.carpooling.carpooling.services.interfaces.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void create(User user) {
+    public User create(User user) {
         if (user == null){
             throw new IllegalArgumentException("User cannot be null");
         }
@@ -52,30 +52,38 @@ public class UserServiceImpl implements UserService {
             throw new EntityDuplicateException("User","username",user.getUsername());
         }
 
-        userRepository.save(user);
+        return userRepository.save(user);
+
     }
 
     @Override
-    public void update(User updatedUser) {
-        User existingUser = userRepository.getUserById(updatedUser.getId());
+    public User update(long id,User updatedUser) {
+        System.out.println("Updating User ID: " + id);
 
-        if (existingUser == null){
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Optional.ofNullable(updatedUser.getUsername()).ifPresent(existingUser::setUsername);
+        Optional.ofNullable(updatedUser.getFirstName()).ifPresent(existingUser::setFirstName);
+        Optional.ofNullable(updatedUser.getLastName()).ifPresent(existingUser::setLastName);
+        Optional.ofNullable(updatedUser.getEmail()).ifPresent(existingUser::setEmail);
+        Optional.ofNullable(updatedUser.getPhoneNumber()).ifPresent(existingUser::setPhoneNumber);
+
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()){
+            existingUser.setPassword(updatedUser.getPassword());
+        }else {
+            System.out.println("Password is empty");
+        }
+        return userRepository.save(existingUser);
+    }
+
+    @Override
+    public void delete(long id) {
+        User user = userRepository.getUserById(id);
+
+        if (user == null){
             throw new IllegalArgumentException("User not found");
         }
-        existingUser.setUsername(updatedUser.getUsername());
-        existingUser.setPassword(updatedUser.getPassword());
-        existingUser.setFirstName(updatedUser.getFirstName());
-        existingUser.setLastName(updatedUser.getLastName());
-        existingUser.setEmail(updatedUser.getEmail());
-        existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
-        userRepository.save(existingUser);
-
-    }
-
-    @Override
-    public void delete(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         userRepository.delete(user);
+
     }
 }

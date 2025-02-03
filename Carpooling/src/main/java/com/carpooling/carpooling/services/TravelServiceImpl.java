@@ -1,6 +1,7 @@
 package com.carpooling.carpooling.services;
 
 import com.carpooling.carpooling.models.Travel;
+import com.carpooling.carpooling.models.User;
 import com.carpooling.carpooling.repositories.TravelRepository;
 import com.carpooling.carpooling.services.interfaces.TravelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,29 +21,35 @@ public class TravelServiceImpl implements TravelService {
     }
 
     @Override
-    public Travel createTravel(Travel travel) {
+    public Travel createTravel(User user, Travel travel) {
         if (travelRepository.existsByDriverAndStartPointAndEndPointAndDepartureTime(
                 travel.getDriver(),travel.getStartPoint(),travel.getEndPoint(),travel.getDepartureTime())){
             throw new IllegalArgumentException("You already have a similar travel scheduled");
         }
+        travel.setDriver(user);
         return travelRepository.save(travel);
     }
 
     @Override
     public Travel updateTravel(Long id, Travel updatedTravel) {
-        Travel existingTravel = travelRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Travel not found"));
+        Travel existingTravel = getTravelById(id);
 
-        if (travelRepository.existsByDriverAndStartPointAndEndPointAndDepartureTime(
-                updatedTravel.getDriver(),updatedTravel.getStartPoint(),updatedTravel.getEndPoint()
-                ,updatedTravel.getDepartureTime())){
-            throw new IllegalArgumentException("You already have a similar travel scheduled");
+        if (updatedTravel.getStartPoint() != null) {
+            existingTravel.setStartPoint(updatedTravel.getStartPoint());
         }
-        existingTravel.setStartPoint(updatedTravel.getStartPoint());
-        existingTravel.setEndPoint(updatedTravel.getEndPoint());
-        existingTravel.setDepartureTime(updatedTravel.getDepartureTime());
-        existingTravel.setFreeSpots(updatedTravel.getFreeSpots());
-        existingTravel.setComment(updatedTravel.getComment());
+        if (updatedTravel.getEndPoint() != null) {
+            existingTravel.setEndPoint(updatedTravel.getEndPoint());
+        }
+        if (updatedTravel.getDepartureTime() != null) {
+            existingTravel.setDepartureTime(updatedTravel.getDepartureTime());
+        }
+        if (updatedTravel.getFreeSpots() != 0) {
+            existingTravel.setFreeSpots(updatedTravel.getFreeSpots());
+        }
+        if (updatedTravel.getComment() != null) {
+            existingTravel.setComment(updatedTravel.getComment());
+        }
+
         return travelRepository.save(existingTravel);
     }
 

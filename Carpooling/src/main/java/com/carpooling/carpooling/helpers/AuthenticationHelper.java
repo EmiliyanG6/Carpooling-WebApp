@@ -29,9 +29,11 @@ public class AuthenticationHelper {
         }
 
         String userInfo = headers.getFirst(AUTHORIZATION_HEADER_NAME);
-        String email = getEmail(userInfo);
+
+        String username = getUsername(userInfo);
         String password = getPassword(userInfo);
-        return verifyAutnentication(email, password);
+
+        return verifyAutnentication(username, password);
     }
     public User tryGetCurrentUser(HttpSession session){
         String currentEmail = (String) session.getAttribute("currentUser");
@@ -42,9 +44,9 @@ public class AuthenticationHelper {
         return userService.getUserByEmail(currentEmail);
     }
 
-    public User verifyAutnentication(String email, String password){
+    public User verifyAutnentication(String username, String password){
         try {
-            User user = userService.getUserByEmail(email);
+            User user = userService.get(username);
             if (!user.getPassword().equals(password)){
                 throw new AuthorizationException(INVALID_AUTHENTICATION_ERROR);
             }
@@ -53,8 +55,8 @@ public class AuthenticationHelper {
             throw new AuthorizationException(INVALID_AUTHENTICATION_ERROR);
         }
     }
-    private String getEmail(String userInfo){
-        int firstSpace = userInfo.indexOf(' ');
+    private String getUsername(String userInfo){
+        int firstSpace = userInfo.indexOf(" ");
         if (firstSpace == -1){
             throw new AuthorizationException(INVALID_AUTHENTICATION_ERROR);
         }

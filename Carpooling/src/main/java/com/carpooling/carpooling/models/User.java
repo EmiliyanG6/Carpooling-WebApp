@@ -2,8 +2,10 @@ package com.carpooling.carpooling.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -17,7 +19,7 @@ public class User {
     @Column(name = "username")
     private String username;
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password")
     private String password;
 
@@ -31,6 +33,7 @@ public class User {
     private String email;
 
     @NotNull(message = "Phone number is required")
+    @Size(min = 10,max = 10, message = "Phone number must be 10 digits")
     @Column(name = "phone_number")
     private String phoneNumber;
 

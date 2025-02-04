@@ -1,5 +1,6 @@
 package com.carpooling.carpooling.services;
 
+import com.carpooling.carpooling.exceptions.AuthorizationException;
 import com.carpooling.carpooling.models.Travel;
 import com.carpooling.carpooling.models.User;
 import com.carpooling.carpooling.repositories.TravelRepository;
@@ -54,10 +55,8 @@ public class TravelServiceImpl implements TravelService {
     }
 
     @Override
-    public void deleteTravel(Long id) {
-        if (!travelRepository.existsById(id)) {
-            throw new IllegalArgumentException("Travel not found");
-        }
+    public void deleteTravel(Long id, User user) {
+        checkModifyPermissions(id,user);
         travelRepository.deleteById(id);
     }
 
@@ -76,5 +75,12 @@ public class TravelServiceImpl implements TravelService {
     public List<Travel> searchTravels(String startingPoint, String endingPoint, LocalDateTime departureTime) {
         return travelRepository.findByStartPointAndEndPointAndDepartureTime(
                 startingPoint,endingPoint,departureTime);
+    }
+
+    private void checkModifyPermissions(long travelId, User user) {
+        Travel travel = travelRepository.getById(travelId);
+        if (!(user.isAdmin() || travel.getDriver().equals(user))) {
+            throw new AuthorizationException("You don't have to delete this travel");
+        }
     }
 }

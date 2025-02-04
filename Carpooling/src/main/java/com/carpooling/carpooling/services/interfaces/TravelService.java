@@ -9,7 +9,7 @@ import java.util.List;
 public interface TravelService {
     Travel createTravel(User user, Travel travel);
     Travel updateTravel(Long id,Travel updatedTravel);
-    void deleteTravel(Long id);
+    void deleteTravel(Long id, User user);
     Travel getTravelById(Long id);
     List<Travel> getAllTravels();
     List<Travel> searchTravels(String startingPoint, String endingPoint, LocalDateTime departureTime);

@@ -17,4 +17,8 @@ public interface TravelService {
     void applyForTravel(long id, User user);
 
     void approvePassenger(long id, long userId, User user);
+
+    void rejectPassenger(long travelId, long userId, User user);
+
+    void canceTravel(long id, User user);
 }

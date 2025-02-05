@@ -109,4 +109,24 @@ public class TravelRestController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to approve passenger");
         }
     }
+
+    @PutMapping("/{travelId}/reject/{userId}")
+    public void rejectPassenger(@RequestHeader HttpHeaders headers,@PathVariable long travelId,@PathVariable long userId){
+        try {
+            User user = authenticationHelper.tryGetUser(headers);
+            travelService.rejectPassenger(travelId,userId,user);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to reject passenger");
+        }
+    }
+
+    @DeleteMapping("/{id}/cancel")
+    public void cancelTravel(@RequestHeader HttpHeaders headers, @PathVariable long id){
+        try {
+            User user = authenticationHelper.tryGetUser(headers);
+            travelService.canceTravel(id,user);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to cancel travel");
+        }
+    }
 }

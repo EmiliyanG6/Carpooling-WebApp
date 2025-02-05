@@ -152,6 +152,37 @@ public class TravelServiceImpl implements TravelService {
 
     }
 
+    @Override
+    public void rejectPassenger(long travelId, long userId, User aprovingUser) {
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(()-> new IllegalArgumentException("Travel not found"));
+
+        if (!aprovingUser.isAdmin() && travel.getDriver().getId() != aprovingUser.getId()) {
+            throw new IllegalArgumentException("You are not authorized to reject passengers.");
+        }
+        Passenger passenger = passengerRepository.findByUserIdAndTravelId(userId,travelId)
+                .orElseThrow(()-> new IllegalArgumentException("Passenger not found"));
+
+        passenger.setStatus(PassengerStatus.REJECTED);
+        passengerRepository.delete(passenger);
+    }
+
+    @Override
+    public void canceTravel(long travelId, User existingUser) {
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(()-> new IllegalArgumentException("Travel not found"));
+
+        if (!existingUser.isAdmin() && travel.getDriver().getId() != existingUser.getId()) {
+            throw new IllegalArgumentException("You are not authorized to cancel travel.");
+        }
+        for (Passenger passenger : travel.getPassengers()) {
+            passenger.setStatus(PassengerStatus.CANCELED);
+        }
+
+        travelRepository.delete(travel);
+
+    }
+
 
     private void checkModifyPermissions(long travelId, User user) {
         Travel travel = travelRepository.getById(travelId);

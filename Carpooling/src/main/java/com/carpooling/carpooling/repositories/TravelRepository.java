@@ -3,6 +3,8 @@ package com.carpooling.carpooling.repositories;
 
 import com.carpooling.carpooling.models.Travel;
 import com.carpooling.carpooling.models.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -19,5 +21,8 @@ public interface TravelRepository extends JpaRepository<Travel, Long> {
     boolean existsByDriverAndStartPointAndEndPointAndDepartureTime(
             User driver, String startingPoint, String endingPoint, LocalDateTime departureTime);
 
+    Page<Travel> findByStartPoint(String filterValue, Pageable pageable);
+
+    Page<Travel> findByEndPoint(String filterValue, Pageable pageable);
 }
 

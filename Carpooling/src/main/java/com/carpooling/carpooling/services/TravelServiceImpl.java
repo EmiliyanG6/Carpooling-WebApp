@@ -1,24 +1,34 @@
 package com.carpooling.carpooling.services;
 
+import com.carpooling.carpooling.enums.PassengerStatus;
 import com.carpooling.carpooling.exceptions.AuthorizationException;
+import com.carpooling.carpooling.models.Passenger;
 import com.carpooling.carpooling.models.Travel;
 import com.carpooling.carpooling.models.User;
+import com.carpooling.carpooling.repositories.PassengerRepository;
 import com.carpooling.carpooling.repositories.TravelRepository;
 import com.carpooling.carpooling.services.interfaces.TravelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TravelServiceImpl implements TravelService {
 
     private final TravelRepository travelRepository;
+    private final PassengerRepository passengerRepository;
 
     @Autowired
-    public TravelServiceImpl(TravelRepository travelRepository) {
+    public TravelServiceImpl(TravelRepository travelRepository, PassengerRepository passengerRepository) {
         this.travelRepository = travelRepository;
+        this.passengerRepository = passengerRepository;
     }
 
     @Override
@@ -67,8 +77,29 @@ public class TravelServiceImpl implements TravelService {
     }
 
     @Override
-    public List<Travel> getAllTravels() {
-        return travelRepository.findAll();
+    public List<Travel> getAllTravels(int page, int size, String sortBy, String filterBy, String filterValue) {
+        Sort sort = Sort.by(Sort.Direction.ASC, sortBy != null ? sortBy : "departureTime");
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Travel> travelsPage;
+
+        if (filterBy != null && filterValue != null) {
+            switch (filterBy.toLowerCase()) {
+                case "startingpoint":
+                    travelsPage = travelRepository.findByStartPoint(filterValue, pageable);
+                    break;
+                case "endingpoint":
+                    travelsPage = travelRepository.findByEndPoint(filterValue, pageable);
+                    break;
+                default:
+                    travelsPage = travelRepository.findAll(pageable);
+            }
+        } else {
+            travelsPage = travelRepository.findAll(pageable);
+        }
+
+
+        return travelsPage.getContent();
     }
 
     @Override
@@ -76,6 +107,51 @@ public class TravelServiceImpl implements TravelService {
         return travelRepository.findByStartPointAndEndPointAndDepartureTime(
                 startingPoint,endingPoint,departureTime);
     }
+
+    @Override
+    public void applyForTravel(long id, User user) {
+        Travel travel = travelRepository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("Travel not found"));
+
+        if (travel.getDriver().getId() == user.getId()) {
+            throw new IllegalArgumentException("The driver cannot apply as a passenger");
+        }
+
+        Optional<Passenger> existingPassenger = passengerRepository.findByUserAndTravel(user,travel);
+        if (existingPassenger.isPresent()) {
+            throw new IllegalArgumentException("You already applied for this travel");
+        }
+
+        Passenger passenger = new Passenger();
+        passenger.setUser(user);
+        passenger.setTravel(travel);
+
+        passengerRepository.save(passenger);
+    }
+
+    @Override
+    public void approvePassenger(long travelId, long userId, User approvingUser) {
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(()-> new IllegalArgumentException("Travel not found"));
+
+        if (!approvingUser.isAdmin() && travel.getDriver().getId() != approvingUser.getId()) {
+            throw new IllegalArgumentException("You are not authorized to approve passengers.");
+        }
+
+        Passenger passenger = passengerRepository.findByUserIdAndTravelId(userId, travelId)
+                .orElseThrow(()-> new IllegalArgumentException("Passenger not found"));
+
+        if (travel.getFreeSpots() <= 0){
+            throw new IllegalArgumentException("You are not authorized to approve passengers.");
+        }
+        passenger.setStatus(PassengerStatus.APPROVED);
+        travel.setFreeSpots(travel.getFreeSpots() - 1);
+
+        passengerRepository.save(passenger);
+        travelRepository.save(travel);
+
+    }
+
 
     private void checkModifyPermissions(long travelId, User user) {
         Travel travel = travelRepository.getById(travelId);

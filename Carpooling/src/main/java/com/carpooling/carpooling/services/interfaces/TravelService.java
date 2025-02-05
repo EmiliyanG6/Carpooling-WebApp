@@ -11,6 +11,10 @@ public interface TravelService {
     Travel updateTravel(Long id,Travel updatedTravel);
     void deleteTravel(Long id, User user);
     Travel getTravelById(Long id);
-    List<Travel> getAllTravels();
+    List<Travel> getAllTravels(int page, int size, String sortBy, String filterBy, String filterValue);
     List<Travel> searchTravels(String startingPoint, String endingPoint, LocalDateTime departureTime);
+
+    void applyForTravel(long id, User user);
+
+    void approvePassenger(long id, long userId, User user);
 }

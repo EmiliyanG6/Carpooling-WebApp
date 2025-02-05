@@ -1,6 +1,7 @@
 package com.carpooling.carpooling.models;
 
 
+import com.carpooling.carpooling.enums.PassengerStatus;
 import jakarta.persistence.*;
 
 @Entity
@@ -20,7 +21,8 @@ public class Passenger {
     private User user;
 
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private PassengerStatus status = PassengerStatus.PENDING;
 
     public Long getId() {
         return id;
@@ -46,11 +48,11 @@ public class Passenger {
         this.user = user;
     }
 
-    public String getStatus() {
+    public PassengerStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(PassengerStatus status) {
         this.status = status;
     }
 }

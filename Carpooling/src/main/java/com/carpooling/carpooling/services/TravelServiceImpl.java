@@ -2,12 +2,17 @@ package com.carpooling.carpooling.services;
 
 import com.carpooling.carpooling.enums.PassengerStatus;
 import com.carpooling.carpooling.exceptions.AuthorizationException;
+import com.carpooling.carpooling.models.Dtos.FeedbackDto;
+import com.carpooling.carpooling.models.Dtos.TravelDto;
+import com.carpooling.carpooling.models.Feedback;
 import com.carpooling.carpooling.models.Passenger;
 import com.carpooling.carpooling.models.Travel;
 import com.carpooling.carpooling.models.User;
+import com.carpooling.carpooling.repositories.FeedbackRepository;
 import com.carpooling.carpooling.repositories.PassengerRepository;
 import com.carpooling.carpooling.repositories.TravelRepository;
 import com.carpooling.carpooling.services.interfaces.TravelService;
+import com.carpooling.carpooling.services.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,19 +21,25 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TravelServiceImpl implements TravelService {
 
     private final TravelRepository travelRepository;
     private final PassengerRepository passengerRepository;
+    private final UserService userService;
+    private final FeedbackRepository feedbackRepository;
 
     @Autowired
-    public TravelServiceImpl(TravelRepository travelRepository, PassengerRepository passengerRepository) {
+    public TravelServiceImpl(TravelRepository travelRepository, PassengerRepository passengerRepository, UserService userService, FeedbackRepository feedbackRepository) {
         this.travelRepository = travelRepository;
         this.passengerRepository = passengerRepository;
+        this.userService = userService;
+        this.feedbackRepository = feedbackRepository;
     }
 
     @Override
@@ -181,6 +192,49 @@ public class TravelServiceImpl implements TravelService {
 
         travelRepository.delete(travel);
 
+    }
+
+    @Override
+    public void completeTravel(long travelId, User driver) {
+        Travel travel = getTravelById(travelId);
+
+        if (!travel.getDriver().equals(driver)){
+            throw new IllegalArgumentException("You are not authorized to complete travel.");
+        }
+        travel.setCompleted(true);
+        travelRepository.save(travel);
+
+    }
+
+    @Override
+    public void leaveFeedback(long travelId, long receiverId, User giver, FeedbackDto feedbackDto) {
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(()-> new IllegalArgumentException("Travel not found"));
+        User receiver = userService.getUserById(receiverId);
+
+        if (travel.getPassengers().stream().map(Passenger::getUser).noneMatch(user -> user.equals(receiver) &&
+                !travel.getDriver().equals(receiver))){
+            throw new IllegalArgumentException("You are not authorized to leave feedback.");
+        }
+        Feedback feedback = new Feedback();
+        feedback.setTravel(travel);
+        feedback.setGiver(giver);
+        feedback.setReceiver(receiver);
+        feedback.setRating(feedbackDto.getRating());
+        feedback.setComment(feedbackDto.getComment());
+
+        feedbackRepository.save(feedback);
+    }
+
+    @Override
+    public List<TravelDto> getUserTravels(long userId, int page, int size, String sortBy, String filterBy, String filterValue) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy != null ? sortBy : "departure_time").descending());
+
+        Page<Travel> travels = travelRepository.findByDriver(userId, pageable);
+
+        return travels.stream()
+                .map(TravelDto::new)
+                .collect(Collectors.toList());
     }
 
 

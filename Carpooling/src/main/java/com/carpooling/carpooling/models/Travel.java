@@ -38,6 +38,17 @@ public class Travel {
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Passenger> passengers;
 
+    @Column(name = "completed",nullable = false)
+    private boolean completed = false;
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
     public Long getId() {
         return id;
     }

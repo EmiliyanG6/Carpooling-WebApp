@@ -4,6 +4,7 @@ package com.carpooling.carpooling.controllers;
 import com.carpooling.carpooling.exceptions.AuthorizationException;
 import com.carpooling.carpooling.helpers.AuthenticationHelper;
 import com.carpooling.carpooling.helpers.TravelMapper;
+import com.carpooling.carpooling.models.Dtos.FeedbackDto;
 import com.carpooling.carpooling.models.Dtos.TravelDto;
 import com.carpooling.carpooling.models.Travel;
 import com.carpooling.carpooling.models.User;
@@ -129,4 +130,42 @@ public class TravelRestController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to cancel travel");
         }
     }
+
+    @PutMapping("/{id}/complete")
+    public void completeTravel(@RequestHeader HttpHeaders headers, @PathVariable long id){
+        try {
+            User user = authenticationHelper.tryGetUser(headers);
+            travelService.completeTravel(id,user);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to complete travel");
+        }
+    }
+
+    @PostMapping("/{travelId}/feedback/{userId}")
+    public void leaveFeedback(@RequestHeader HttpHeaders headers,
+                              @PathVariable long travelId,
+                              @PathVariable long userId,
+                              @RequestBody FeedbackDto feedbackDto){
+        try {
+            User user = authenticationHelper.tryGetUser(headers);
+            travelService.leaveFeedback(travelId,userId,user,feedbackDto);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to leave feedback");
+        }
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<TravelDto> getUserTravels(@PathVariable long userId,
+                                          @RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size,
+                                          @RequestParam(required = false) String sortBy,
+                                          @RequestParam(required = false) String filterBy,
+                                          @RequestParam(required = false) String filterValue){
+        try {
+            return travelService.getUserTravels(userId,page,size,sortBy,filterBy,filterValue);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to get user travels");
+        }
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.carpooling.carpooling.services.interfaces;
 
+import com.carpooling.carpooling.models.Dtos.FeedbackDto;
+import com.carpooling.carpooling.models.Dtos.TravelDto;
 import com.carpooling.carpooling.models.Travel;
 import com.carpooling.carpooling.models.User;
 
@@ -21,4 +23,10 @@ public interface TravelService {
     void rejectPassenger(long travelId, long userId, User user);
 
     void canceTravel(long id, User user);
+
+    void completeTravel(long id, User user);
+
+    void leaveFeedback(long travelId, long receiverId, User giver, FeedbackDto feedbackDto);
+
+    List<TravelDto> getUserTravels(long userId, int page, int size, String sortBy, String filterBy, String filterValue);
 }

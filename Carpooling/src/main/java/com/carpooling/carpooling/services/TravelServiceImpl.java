@@ -21,7 +21,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -236,7 +235,18 @@ public class TravelServiceImpl implements TravelService {
                 .map(TravelDto::new)
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<User> getPendingApplicants(long travelId, User driver) {
+        Travel travel = getTravelById(travelId);
 
+        if (!travel.getDriver().equals(driver)) {
+            throw new IllegalArgumentException("You are not authorized to approve travel.");
+        }
+        return travel.getPassengers().stream()
+                .filter(passenger -> passenger.getStatus() == PassengerStatus.PENDING)
+                .map(Passenger::getUser)
+                .toList();
+    }
 
     private void checkModifyPermissions(long travelId, User user) {
         Travel travel = travelRepository.getById(travelId);

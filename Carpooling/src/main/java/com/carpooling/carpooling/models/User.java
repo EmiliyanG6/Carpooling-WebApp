@@ -41,6 +41,16 @@ public class User {
     @Column(name = "is_admin")
     private boolean isAdmin;
 
+    @Column(name = "is_blocked")
+    private boolean isBlocked;
+
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
+    }
 
     public long getId() {
         return id;

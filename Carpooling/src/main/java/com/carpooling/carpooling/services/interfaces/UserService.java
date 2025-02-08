@@ -13,4 +13,8 @@ public interface UserService {
     User create(User user);
     User update(long id, User updatedUser);
     void delete(long id);
+
+    void setUserBlockStatus(long id, boolean isBlocked);
+
+    List<User> searchUsers(String username, String email, String phone);
 }

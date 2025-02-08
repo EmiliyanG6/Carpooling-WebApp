@@ -61,6 +61,11 @@ public class TravelRestController {
     public Travel createTravel(@RequestHeader HttpHeaders headers, @RequestBody TravelDto travelDto){
         try {
             User user = authenticationHelper.tryGetUser(headers);
+
+            if (user.isBlocked()){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to perform this action.");
+            }
+
             Travel travel = travelMapper.fromDto(travelDto);
             travel.setDriver(user);
             return travelService.createTravel(user,travel);
@@ -96,6 +101,11 @@ public class TravelRestController {
     public void applyForTravel(@RequestHeader HttpHeaders headers, @PathVariable long id){
         try {
             User user = authenticationHelper.tryGetUser(headers);
+
+            if (user.isBlocked()){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to perform this action.");
+            }
+
             travelService.applyForTravel(id,user);
         }catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to apply for travel");
@@ -165,6 +175,17 @@ public class TravelRestController {
             return travelService.getUserTravels(userId,page,size,sortBy,filterBy,filterValue);
         }catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to get user travels");
+        }
+    }
+
+    @GetMapping("/{id}/applicants")
+    public List<User> getPendingApplicants(@RequestHeader HttpHeaders headers,
+                                           @PathVariable long id){
+        try {
+            User driver = authenticationHelper.tryGetUser(headers);
+            return travelService.getPendingApplicants(id,driver);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Failed to get pending applicants");
         }
     }
 

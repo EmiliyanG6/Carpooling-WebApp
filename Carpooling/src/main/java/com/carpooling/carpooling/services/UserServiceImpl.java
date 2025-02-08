@@ -84,6 +84,20 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("User not found");
         }
         userRepository.delete(user);
-
     }
+
+    @Override
+    public void setUserBlockStatus(long id, boolean isBlocked){
+        User user = getUserById(id);
+        user.setBlocked(isBlocked);
+        userRepository.save(user);
+    }
+
+    @Override
+    public List<User> searchUsers(String username,String email, String phone){
+        return userRepository.searchUsers(username,email,phone);
+    }
+
+
+
 }

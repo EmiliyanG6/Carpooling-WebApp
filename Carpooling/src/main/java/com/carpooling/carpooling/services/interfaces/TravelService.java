@@ -29,4 +29,6 @@ public interface TravelService {
     void leaveFeedback(long travelId, long receiverId, User giver, FeedbackDto feedbackDto);
 
     List<TravelDto> getUserTravels(long userId, int page, int size, String sortBy, String filterBy, String filterValue);
+
+    List<User> getPendingApplicants(long travelId, User driver);
 }

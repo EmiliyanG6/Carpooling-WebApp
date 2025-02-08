@@ -90,19 +90,42 @@ public class UserRestController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,e.getMessage());
         }
     }
-//    @GetMapping("/search")
-//    public List<User> searchUser(@RequestHeader HttpHeaders headers,
-//                                 @RequestParam(required = false) String username,
-//                                 @RequestParam(required = false) String email,
-//                                 @RequestParam(required = false) String phone){
-//        try {
-//            User user = authenticationHelper.tryGetUser(headers);
-//            if (!user.isAdmin()){
-//                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,ERROR_MESSAGE);
-//            }
-//            return userService.se
-//        }
-//    }
+
+    @PutMapping("/{id}/block")
+    public void setUserBlockStatus(@RequestHeader HttpHeaders headers,
+                          @PathVariable long id,
+                          @RequestParam boolean block){
+        try {
+            User admin = authenticationHelper.tryGetUser(headers);
+
+            if (!admin.isAdmin()){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to block this User");
+            }
+            userService.setUserBlockStatus(id,block);
+
+
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,e.getMessage());
+        }
+    }
+
+    @GetMapping("/search")
+    public List<User> searchUsers(@RequestHeader HttpHeaders headers,
+                                  @RequestParam(required = false) String username,
+                                  @RequestParam(required = false) String email,
+                                  @RequestParam(required = false) String phone){
+        try {
+            User admin = authenticationHelper.tryGetUser(headers);
+
+            if (!admin.isAdmin()){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to search this User");
+            }
+
+            return userService.searchUsers(username,email,phone);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,e.getMessage());
+        }
+    }
 
 
 

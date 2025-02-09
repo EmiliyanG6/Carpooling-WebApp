@@ -1,11 +1,11 @@
 package com.carpooling.carpooling.controllers;
 
-
 import com.carpooling.carpooling.exceptions.AuthorizationException;
 import com.carpooling.carpooling.helpers.AuthenticationHelper;
 import com.carpooling.carpooling.models.User;
 import com.carpooling.carpooling.services.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserRestController {
 
-    public static final String ERROR_MESSAGE = "You are not authorized to browse user information.";
+    private static final String ERROR_MESSAGE = "You are not authorized to perform this action.";
     private final UserService userService;
     private final AuthenticationHelper authenticationHelper;
 
@@ -27,85 +27,70 @@ public class UserRestController {
         this.authenticationHelper = authenticationHelper;
     }
 
-    @GetMapping
-    public List<User> getAllUsers(@RequestHeader HttpHeaders headers){
-        try {
-            User user = authenticationHelper.tryGetUser(headers);
-            if (!user.isAdmin()){
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,ERROR_MESSAGE);
-            }
-            return userService.getAll();
-        }catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,e.getMessage());
-        }
-    }
-
     @GetMapping("/{id:\\d+}")
-    public User getUserById(@RequestHeader HttpHeaders headers,@PathVariable long id){
+    public User getUserById(@RequestHeader HttpHeaders headers, @PathVariable long id) {
         try {
             User user = authenticationHelper.tryGetUser(headers);
-            checkAccessPermissions(id,user);
+            checkAccessPermissions(id, user);
             return userService.getUserById(id);
-        }catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,e.getMessage());
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to retrieve user", e);
         }
     }
-
 
     @PostMapping
-    public User createUser(@RequestBody User newUser){
+    public User createUser(@RequestBody User newUser) {
         try {
             return userService.create(newUser);
-            } catch (Exception e){
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,e.getMessage());
-            }
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to create user", e);
+        }
     }
 
-
     @PutMapping("/{id}")
-    public User updateUser(@RequestHeader HttpHeaders headers, @PathVariable long id, @RequestBody User updatedUser){
+    public User updateUser(@RequestHeader HttpHeaders headers, @PathVariable long id, @RequestBody User updatedUser) {
         try {
-            System.out.println(" Received Update Request for User ID: " + id);
-            System.out.println(" Incoming User object: " + updatedUser);
-
             User user = authenticationHelper.tryGetUser(headers);
-            checkAccessPermissions(id,user);
-            return userService.update(id,updatedUser);
-        }catch (Exception e){
-            System.out.println("Update Failed: " + e.getMessage());
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,e.getMessage());
+            checkAccessPermissions(id, user);
+            return userService.update(id, updatedUser);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to update user", e);
         }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@RequestHeader HttpHeaders headers, @PathVariable long id){
+    public void deleteUser(@RequestHeader HttpHeaders headers, @PathVariable long id) {
         try {
             User requestingUser = authenticationHelper.tryGetUser(headers);
 
-            if (!requestingUser.isAdmin() && requestingUser.getId() != id){
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Your not allowed to delete this User");
+            if (!requestingUser.isAdmin() && requestingUser.getId() != id) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to delete this user.");
             }
             userService.delete(id);
-        }catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,e.getMessage());
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to delete user", e);
         }
     }
 
     @PutMapping("/{id}/block")
     public void setUserBlockStatus(@RequestHeader HttpHeaders headers,
-                          @PathVariable long id,
-                          @RequestParam boolean block){
+                                   @PathVariable long id,
+                                   @RequestParam boolean block) {
         try {
             User admin = authenticationHelper.tryGetUser(headers);
+            checkAdminAccess(admin);
 
-            if (!admin.isAdmin()){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to block this User");
-            }
-            userService.setUserBlockStatus(id,block);
-
-
-        }catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,e.getMessage());
+            userService.setUserBlockStatus(id, block);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to update user block status", e);
         }
     }
 
@@ -113,28 +98,46 @@ public class UserRestController {
     public List<User> searchUsers(@RequestHeader HttpHeaders headers,
                                   @RequestParam(required = false) String username,
                                   @RequestParam(required = false) String email,
-                                  @RequestParam(required = false) String phone){
+                                  @RequestParam(required = false) String phone) {
         try {
             User admin = authenticationHelper.tryGetUser(headers);
+            checkAdminAccess(admin);
 
-            if (!admin.isAdmin()){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to search this User");
-            }
-
-            return userService.searchUsers(username,email,phone);
-        }catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,e.getMessage());
+            return userService.searchUsers(username, email, phone);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to search users", e);
         }
     }
 
+    @GetMapping
+    public Page<User> getAllUsers(@RequestHeader HttpHeaders headers,
+                                  @RequestParam(defaultValue = "0") int page,
+                                  @RequestParam(defaultValue = "10") int size,
+                                  @RequestParam(defaultValue = "id") String sortBy,
+                                  @RequestParam(defaultValue = "ASC") String direction) {
+        try {
+            User admin = authenticationHelper.tryGetUser(headers);
+            checkAdminAccess(admin);
 
+            return userService.getAllUsersPaginated(page, size, sortBy, direction);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to retrieve users", e);
+        }
+    }
 
-    private static void checkAccessPermissions(long targetUserId, User executingUser){
-        if (!executingUser.isAdmin() && executingUser.getId() != targetUserId){
+    private static void checkAccessPermissions(long targetUserId, User executingUser) {
+        if (!executingUser.isAdmin() && executingUser.getId() != targetUserId) {
             throw new AuthorizationException(ERROR_MESSAGE);
         }
-
     }
 
+    private void checkAdminAccess(User user) {
+        if (!user.isAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to perform this action.");
+        }
+    }
 }
-

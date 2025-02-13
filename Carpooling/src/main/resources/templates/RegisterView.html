@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>Carpooling Platform - Register</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+</head>
+<body class="landing is-preload">
+
+<!-- Page Wrapper -->
+<div id="page-wrapper">
+    <!-- Header -->
+    <header id="header" class="alt">
+        <h1><a href="/">Carpooling Platform</a></h1>
+        <nav id="nav">
+            <ul>
+                <li><a th:href="@{/}">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+
+    <!-- Register Section -->
+    <section id="register-section" class="wrapper style1 special">
+        <div class="inner">
+            <header class="major">
+                <h2>Create a New Account</h2>
+            </header>
+            <form th:action="@{/auth/register}" method="post" th:object="${register}">
+                <div class="fields">
+                    <!-- Username -->
+                    <div class="field">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" placeholder="Enter your username" required th:field="*{username}" />
+                        <p class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
+                    </div>
+
+                    <!-- First Name -->
+                    <div class="field">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" placeholder="Enter your first name" required th:field="*{firstName}" />
+                        <p class="error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></p>
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="field">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" placeholder="Enter your last name" required th:field="*{lastName}" />
+                        <p class="error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></p>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required th:field="*{email}" />
+                        <p class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="field">
+                        <label for="phoneNumber">Phone Number</label>
+                        <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" required th:field="*{phoneNumber}" />
+                        <p class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></p>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required th:field="*{password}" />
+                        <p class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="field">
+                        <label for="passwordConfirm">Confirm Password</label>
+                        <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm your password" required th:field="*{passwordConfirm}" />
+                        <p class="error" th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}"></p>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <ul class="actions special">
+                    <li><button type="submit" class="button primary">Register</button></li>
+                </ul>
+            </form>
+
+
+            <p>Already have an account? <a th:href="@{/auth/login}">Login here</a></p>
+        </div>
+    </section>
+</div>
+
+<!-- Footer -->
+<footer id="footer">
+    <ul class="icons">
+        <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+        <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+        <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+    </ul>
+</footer>
+
+<!-- Scripts -->
+<script th:src="@{/js/jquery.min.js}"></script>
+</body>
+</html>

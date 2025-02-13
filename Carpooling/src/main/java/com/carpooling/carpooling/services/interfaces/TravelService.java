@@ -31,4 +31,10 @@ public interface TravelService {
     List<TravelDto> getUserTravels(long userId, int page, int size, String sortBy, String filterBy, String filterValue);
 
     List<User> getPendingApplicants(long travelId, User driver);
+
+    List<Travel> getActiveTravels();
+
+    List<Travel> getCompletedTravels();
+
+    List<Travel> getCanceledTravels();
 }

@@ -1,4 +1,4 @@
-package com.carpooling.carpooling.controllers;
+package com.carpooling.carpooling.controllers.rest;
 
 
 import com.carpooling.carpooling.models.Dtos.FeedbackDto;

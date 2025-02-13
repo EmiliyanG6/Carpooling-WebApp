@@ -1,6 +1,7 @@
 package com.carpooling.carpooling.services;
 
 import com.carpooling.carpooling.enums.PassengerStatus;
+import com.carpooling.carpooling.enums.TravelStatus;
 import com.carpooling.carpooling.exceptions.AuthorizationException;
 import com.carpooling.carpooling.models.Dtos.FeedbackDto;
 import com.carpooling.carpooling.models.Dtos.TravelDto;
@@ -69,6 +70,10 @@ public class TravelServiceImpl implements TravelService {
         }
         if (updatedTravel.getComment() != null) {
             existingTravel.setComment(updatedTravel.getComment());
+        }
+
+        if (updatedTravel.getStatus() != null) {
+            existingTravel.setStatus(updatedTravel.getStatus());
         }
 
         return travelRepository.save(existingTravel);
@@ -189,7 +194,8 @@ public class TravelServiceImpl implements TravelService {
             passenger.setStatus(PassengerStatus.CANCELED);
         }
 
-        travelRepository.delete(travel);
+        travel.setStatus(TravelStatus.CANCELED);
+        travelRepository.save(travel);
 
     }
 
@@ -200,6 +206,7 @@ public class TravelServiceImpl implements TravelService {
         if (!travel.getDriver().equals(driver)){
             throw new IllegalArgumentException("You are not authorized to complete travel.");
         }
+        travel.setStatus(TravelStatus.COMPLETED);
         travel.setCompleted(true);
         travelRepository.save(travel);
 
@@ -247,6 +254,18 @@ public class TravelServiceImpl implements TravelService {
                 .map(Passenger::getUser)
                 .toList();
     }
+    @Override
+    public List<Travel> getActiveTravels() {
+        return travelRepository.findByStatus(TravelStatus.ACTIVE);
+    }
+    @Override
+    public List<Travel> getCompletedTravels() {
+        return travelRepository.findByStatus(TravelStatus.COMPLETED);
+    }
+    @Override
+    public List<Travel> getCanceledTravels() {
+        return travelRepository.findByStatus(TravelStatus.CANCELED);
+    }
 
     private void checkModifyPermissions(long travelId, User user) {
         Travel travel = travelRepository.getById(travelId);
@@ -254,4 +273,5 @@ public class TravelServiceImpl implements TravelService {
             throw new AuthorizationException("You don't have to delete this travel");
         }
     }
+
 }

@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>Carpooling Platform - Login</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+</head>
+<body class="landing is-preload">
+
+<!-- Page Wrapper -->
+<div id="page-wrapper">
+    <!-- Header -->
+    <header id="header" class="alt">
+        <h1><a href="/">Carpooling Platform</a></h1>
+        <nav id="nav">
+            <ul>
+                <li><a th:href="@{/}">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+
+    <!-- Login Section -->
+    <section id="login-section" class="wrapper style1 special">
+        <div class="inner">
+            <header class="major">
+                <h2>Login to Your Account</h2>
+            </header>
+            <form th:action="@{/auth/login}" th:object="${login}" method="post" class="login-form">
+                <div class="fields">
+                    <div class="field">
+                        <label for="username">Username</label>
+                        <input type="text" th:field="*{username}" id="username" placeholder="Enter your username" required />
+                        <p class="error-message" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
+                    </div>
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input type="password" th:field="*{password}" id="password" placeholder="Enter your password" required />
+                        <p class="error-message" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+                    </div>
+                </div>
+                <ul class="actions special">
+                    <li><button type="submit" class="button primary">Login</button></li>
+                </ul>
+            </form>
+
+            <p>Don't have an account? <a th:href="@{/auth/register}">Register here</a></p>
+        </div>
+    </section>
+</div>
+
+<!-- Footer -->
+<footer id="footer">
+    <ul class="icons">
+        <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+        <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+        <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+    </ul>
+</footer>
+
+<!-- Scripts -->
+<script th:src="@{/js/jquery.min.js}"></script>
+</body>
+</html>

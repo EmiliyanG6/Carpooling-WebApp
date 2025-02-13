@@ -36,12 +36,12 @@ public class AuthenticationHelper {
         return verifyAutnentication(username, password);
     }
     public User tryGetCurrentUser(HttpSession session){
-        String currentEmail = (String) session.getAttribute("currentUser");
+        String currentUsername = (String) session.getAttribute("currentUser");
 
-        if (currentEmail == null){
+        if (currentUsername == null){
             throw new AuthorizationException(INVALID_AUTHENTICATION_ERROR);
         }
-        return userService.getUserByEmail(currentEmail);
+        return userService.get(currentUsername);
     }
 
     public User verifyAutnentication(String username, String password){

@@ -1,6 +1,6 @@
 package com.carpooling.carpooling.helpers;
 
-import com.carpooling.carpooling.dto.RegisterDto;
+import com.carpooling.carpooling.models.Dtos.RegisterDto;
 import com.carpooling.carpooling.models.User;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +14,7 @@ public class UserMapper {
         user.setEmail(registerDto.getEmail());
         user.setFirstName(registerDto.getFirstName());
         user.setLastName(registerDto.getLastName());
+        user.setPhoneNumber(registerDto.getPhoneNumber());
         return user;
     }
 

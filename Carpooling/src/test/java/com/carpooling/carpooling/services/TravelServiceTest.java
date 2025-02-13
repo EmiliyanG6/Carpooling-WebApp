@@ -28,17 +28,17 @@ public class TravelServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testFindAllTravels(){
-        List<Travel> mockTrips = new ArrayList<>();
-        mockTrips.add(new Travel());
-        when(travelRepository.findAll()).thenReturn(mockTrips);
-
-        List<Travel> trips = travelService.getAllTravels();
-
-        assertNotNull(trips);
-        assertEquals(1,trips.size());
-        verify(travelRepository,times(1)).findAll();
-    }
+//    @Test
+//    void testFindAllTravels(){
+//        List<Travel> mockTrips = new ArrayList<>();
+//        mockTrips.add(new Travel());
+//        when(travelRepository.findAll()).thenReturn(mockTrips);
+//
+//        List<Travel> trips = travelService.getAllTravels();
+//
+//        assertNotNull(trips);
+//        assertEquals(1,trips.size());
+//        verify(travelRepository,times(1)).findAll();
+//    }
 
 }

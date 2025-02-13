@@ -1,13 +1,12 @@
-package com.carpooling.carpooling.dto;
+package com.carpooling.carpooling.models.Dtos;
 
 
 import jakarta.validation.constraints.NotEmpty;
-import org.antlr.v4.runtime.misc.NotNull;
 
 public class LoginDto {
 
     @NotEmpty(message = "Username can't be empty")
-    private String email;
+    private String username;
 
     @NotEmpty(message = "Password can't be empty")
     private String password;
@@ -16,12 +15,12 @@ public class LoginDto {
 
     }
 
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {

@@ -1,6 +1,7 @@
 package com.carpooling.carpooling.repositories;
 
 
+import com.carpooling.carpooling.enums.TravelStatus;
 import com.carpooling.carpooling.models.Travel;
 import com.carpooling.carpooling.models.User;
 import org.springframework.data.domain.Page;
@@ -31,5 +32,7 @@ public interface TravelRepository extends JpaRepository<Travel, Long> {
             countQuery = "SELECT COUNT(*) FROM travels WHERE driver_id = :userId",
             nativeQuery = true)
     Page<Travel> findByDriver(@Param("userId") long userId, Pageable pageable);
+
+    List<Travel> findByStatus(TravelStatus status);
 }
 

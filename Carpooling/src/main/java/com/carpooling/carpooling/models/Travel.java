@@ -1,6 +1,8 @@
 package com.carpooling.carpooling.models;
 
 
+import com.carpooling.carpooling.enums.TravelStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import org.springframework.lang.NonNull;
 
@@ -22,6 +24,7 @@ public class Travel {
     private String endPoint;
 
     @Column(name = "departure_time")
+    @JsonFormat(pattern = "dd MM yyyy, hh:mm a")
     private LocalDateTime departureTime;
 
     @NonNull
@@ -40,6 +43,18 @@ public class Travel {
 
     @Column(name = "completed",nullable = false)
     private boolean completed = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "travel_status")
+    private TravelStatus status = TravelStatus.ACTIVE;
+
+    public TravelStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TravelStatus status) {
+        this.status = status;
+    }
 
     public boolean isCompleted() {
         return completed;

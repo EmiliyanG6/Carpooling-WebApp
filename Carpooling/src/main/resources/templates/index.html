@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<title>Carpooling Platform</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" th:href="@{/css/main.css}" />
+</head>
+<body class="landing is-preload">
+<div id="page-wrapper">
+	<header id="header" class="alt">
+		<h1><a href="/">Carpooling Platform</a></h1>
+		<nav id="nav">
+			<ul>
+				<li class="special">
+					<a href="#menu" class="menuToggle"><span>Menu</span></a>
+					<div id="menu">
+						<ul>
+							<li><a href="/">Home</a></li>
+							<li><a href="/trips">Find Rides</a></li>
+							<li><a href="/offer-ride">Offer a Ride</a></li>
+							<li th:if="${session.currentUser == null}"><a href="/auth/register">Sign Up</a></li>
+							<li th:if="${session.currentUser == null}"><a href="/auth/login">Log In</a></li>
+							<li th:if="${session.currentUser != null}"><a href="/profile">Profile</a></li>
+							<li th:if="${session.currentUser != null}"><a href="/auth/logout">Logout</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</nav>
+	</header>
+	<section id="banner">
+		<div class="inner">
+			<h2>Carpooling Made Easy</h2>
+			<p>Connect with people traveling your way.<br/>
+				Save money, reduce carbon footprint, and enjoy the ride.</p>
+			<ul class="actions special">
+				<li><a href="/trips" class="button primary">Find a Ride</a></li>
+				<li><a href="/offer-ride" class="button">Offer a Ride</a></li>
+			</ul>
+		</div>
+		<a href="#one" class="more scrolly">Learn More</a>
+	</section>
+
+	<!-- One -->
+	<section id="one" class="wrapper style1 special">
+		<div class="inner">
+			<header class="major">
+				<h2>Find Rides, Share Journeys</h2>
+				<p>Our platform connects drivers and passengers heading in the same direction.<br/>
+					Save fuel costs, reduce congestion, and make commuting stress-free.</p>
+			</header>
+		</div>
+	</section>
+
+	<!-- Two -->
+	<section id="two" class="wrapper alt style2">
+		<section class="spotlight">
+			<div class="image"><img src="/css/images/HomePhoto2.jpg" alt="Carpooling" /></div>
+			<div class="content">
+				<h2>Affordable & Convenient</h2>
+				<p>Save money on travel expenses by sharing rides with others going your way.</p>
+			</div>
+		</section>
+		<section class="spotlight">
+			<div class="image"><img src="/css/images/HomePhoto3.jpg" alt="Community" /></div>
+			<div class="content">
+				<h2>Safe & Reliable</h2>
+				<p>Connect with verified users and enjoy a safer journey.</p>
+			</div>
+		</section>
+	</section>
+
+	<!-- CTA -->
+	<section id="cta" class="wrapper style4">
+		<div class="inner">
+			<header>
+				<h2>Join Us Today</h2>
+				<p>Whether you're a driver or passenger, carpooling has never been easier.</p>
+			</header>
+			<ul class="actions stacked">
+				<li><a href="/auth/register" class="button fit primary">Sign Up</a></li>
+				<li><a href="/trips" class="button fit">Find a Ride</a></li>
+			</ul>
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<footer id="footer">
+		<ul class="icons">
+			<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+			<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+			<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+		</ul>
+	</footer>
+
+</div>
+
+<!-- Scripts -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/jquery.scrollex.min.js}"></script>
+<script th:src="@{/js/jquery.scrolly.min.js}"></script>
+<script th:src="@{/js/browser.min.js}"></script>
+<script th:src="@{/js/breakpoints.min.js}"></script>
+<script th:src="@{/js/util.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+
+</body>
+</html>

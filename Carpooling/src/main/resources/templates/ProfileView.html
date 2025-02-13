@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+
+    <!-- Spectral Theme Styles -->
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <noscript><link rel="stylesheet" th:href="@{/css/noscript.css}" /></noscript>
+</head>
+<body class="is-preload">
+
+<!-- Page Wrapper -->
+<div id="page-wrapper">
+
+    <!-- Header -->
+    <header id="header">
+        <h1><a href="/">Carpooling</a></h1>
+        <nav id="nav">
+            <ul>
+                <li class="special">
+                    <a href="#menu" class="menuToggle"><span>Menu</span></a>
+                    <div id="menu">
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/profile">Profile</a></li>
+                            <li><a href="/travels">My Travels</a></li>
+                            <li><a href="/logout">Log Out</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <article id="main">
+        <header>
+            <h2>Profile</h2>
+            <p>Manage your profile and travel details</p>
+        </header>
+        <section class="wrapper style5">
+            <div class="inner">
+
+                <!-- Profile Information -->
+                <div class="box">
+                    <h2>Profile Information</h2>
+                    <p><strong>First Name:</strong> <span th:text="${user.firstName}"></span></p>
+                    <p><strong>Last Name:</strong> <span th:text="${user.lastName}"></span></p>
+                    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                    <p><strong>Phone:</strong> <span th:text="${user.phoneNumber}"></span></p>
+                    <a th:href="@{/profile/edit}" class="button primary">Edit Profile</a>
+                </div>
+
+                <!-- Active Travels -->
+                <section>
+                    <h2>Your Active Travels</h2>
+                    <ul class="alt" th:if="${not #lists.isEmpty(activeTravels)}">
+                        <li th:each="travel : ${activeTravels}">
+                            <a th:href="@{/travel/{id}(id=${travel.id})}" class="button fit">
+                                <span th:text="${travel.startingPoint} + ' to ' + ${travel.endingPoint}"></span>
+                            </a>
+                            <p>Departure: <span th:text="${#temporals.format(travel.departureTime, 'dd MMM yyyy, hh:mm a')}"></span></p>
+                            <p>Available Seats: <span th:text="${travel.freeSpots}"></span></p>
+                        </li>
+                    </ul>
+                    <p th:if="${#lists.isEmpty(activeTravels)}">No active travels available.</p>
+                </section>
+
+                <!-- Completed Travels -->
+                <section>
+                    <h2>Completed Travels</h2>
+                    <ul class="alt" th:if="${not #lists.isEmpty(completedTravels)}">
+                        <li th:each="travel : ${completedTravels}">
+                            <a th:href="@{/travel/{id}(id=${travel.id})}" class="button fit">
+                                <span th:text="${travel.startingPoint} + ' to ' + ${travel.endingPoint}"></span>
+                            </a>
+                            <p>Departure: <span th:text="${#temporals.format(travel.departureTime, 'dd MMM yyyy, hh:mm a')}"></span></p>
+                        </li>
+                    </ul>
+                    <p th:if="${#lists.isEmpty(completedTravels)}">No completed travels available.</p>
+                </section>
+
+                <!-- Canceled Travels -->
+                <section>
+                    <h2>Canceled Travels</h2>
+                    <ul class="alt" th:if="${not #lists.isEmpty(canceledTravels)}">
+                        <li th:each="travel : ${canceledTravels}">
+                            <a th:href="@{/travel/{id}(id=${travel.id})}" class="button fit">
+                                <span th:text="${travel.startingPoint} + ' to ' + ${travel.endingPoint}"></span>
+                            </a>
+                            <p>Departure: <span th:text="${#temporals.format(travel.departureTime, 'dd MMM yyyy, hh:mm a')}"></span></p>
+                        </li>
+                    </ul>
+                    <p th:if="${#lists.isEmpty(canceledTravels)}">No canceled travels available.</p>
+                </section>
+
+                <!-- Feedbacks -->
+                <section class="feedback-section">
+                    <h2>Your Feedbacks</h2>
+                    <ul class="alt" th:if="${not #lists.isEmpty(feedbacks)}">
+                        <li th:each="feedback : ${feedbacks}">
+                            <p>⭐ Rating: <span th:text="${feedback.rating}"></span></p>
+                            <p>💬 Comment: <span th:text="${feedback.comment}"></span></p>
+                            <p>📝 Given By: <span th:text="${feedback.giverUsername}"></span></p>
+                        </li>
+                    </ul>
+                    <p th:if="${#lists.isEmpty(feedbacks)}">No feedback available.</p>
+                </section>
+
+            </div>
+        </section>
+    </article>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <ul class="icons">
+            <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+            <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+            <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+            <li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
+        </ul>
+    </footer>
+
+</div>
+
+<!-- Scripts -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/jquery.scrollex.min.js}"></script>
+<script th:src="@{/js/jquery.scrolly.min.js}"></script>
+<script th:src="@{/js/browser.min.js}"></script>
+<script th:src="@{/js/breakpoints.min.js}"></script>
+<script th:src="@{/js/util.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+
+</body>
+</html>

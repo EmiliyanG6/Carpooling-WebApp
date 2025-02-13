@@ -1,4 +1,4 @@
-package com.carpooling.carpooling.controllers;
+package com.carpooling.carpooling.controllers.rest;
 
 import com.carpooling.carpooling.exceptions.AuthorizationException;
 import com.carpooling.carpooling.helpers.AuthenticationHelper;

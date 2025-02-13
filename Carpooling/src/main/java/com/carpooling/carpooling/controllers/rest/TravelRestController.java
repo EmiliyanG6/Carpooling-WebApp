@@ -1,7 +1,6 @@
-package com.carpooling.carpooling.controllers;
+package com.carpooling.carpooling.controllers.rest;
 
 
-import com.carpooling.carpooling.exceptions.AuthorizationException;
 import com.carpooling.carpooling.helpers.AuthenticationHelper;
 import com.carpooling.carpooling.helpers.TravelMapper;
 import com.carpooling.carpooling.models.Dtos.FeedbackDto;
@@ -62,14 +61,17 @@ public class TravelRestController {
         try {
             User user = authenticationHelper.tryGetUser(headers);
 
-            if (user.isBlocked()){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to perform this action.");
+
+            if (travelDto.getStartingPoint() == null || travelDto.getEndingPoint() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start or end location is missing!");
             }
 
             Travel travel = travelMapper.fromDto(travelDto);
+
             travel.setDriver(user);
-            return travelService.createTravel(user,travel);
-        }catch (Exception e){
+            return travelService.createTravel(user, travel);
+
+        } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to create travel", e);
         }
     }

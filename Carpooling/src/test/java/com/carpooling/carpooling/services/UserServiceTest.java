@@ -98,7 +98,7 @@ public class UserServiceTest {
         when(userRepository.getUserById(userId)).thenReturn(existingUser);
         when(userRepository.save(existingUser)).thenReturn(existingUser);
 
-        userService.update(updatedUser);
+        userService.update(updatedUser.getId(), updatedUser);
 
         verify(userRepository, times(1)).getUserById(userId);
         verify(userRepository, times(1)).save(existingUser);

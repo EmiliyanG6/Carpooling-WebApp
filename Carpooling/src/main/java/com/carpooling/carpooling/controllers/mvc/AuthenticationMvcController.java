@@ -99,4 +99,16 @@ public class AuthenticationMvcController {
             return "RegisterView";
         }
     }
+    @GetMapping("/error")
+    public String showErrorPage(Model model, HttpSession session) {
+        String username = (String) session.getAttribute("currentUser");
+        if (username != null) {
+            User user = userService.get(username);  // Get user from DB
+            if (user != null) {
+                model.addAttribute("userId", user.getId());
+            }
+        }
+        model.addAttribute("error", "An unexpected error occurred.");
+        return "ErrorView";
+    }
 }

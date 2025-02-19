@@ -32,9 +32,13 @@ public interface TravelService {
 
     List<User> getPendingApplicants(long travelId, User driver);
 
-    List<Travel> getActiveTravels();
+    List<Travel> getActiveTravelsByUser(Long userId);
 
-    List<Travel> getCompletedTravels();
+    List<Travel> getCompletedTravelsByUser(Long userId);
 
-    List<Travel> getCanceledTravels();
+    List<Travel> getCanceledTravelsByUser(Long userId);
+
+    List<Travel> getActiveTravelsByDriver(long driverId);
+
+    List<Travel> getAllActiveTravels();
 }

@@ -1,0 +1,198 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>Travel Details - Spectral Theme</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <noscript><link rel="stylesheet" th:href="@{/css/noscript.css}" /></noscript>
+</head>
+<body class="is-preload">
+
+<div id="page-wrapper">
+
+    <!-- Header -->
+    <header id="header">
+        <h1><a href="/">Carpooling</a></h1>
+        <nav id="nav">
+            <ul>
+                <li class="special">
+                    <a href="#menu" class="menuToggle"><span>Menu</span></a>
+                    <div id="menu">
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li th:if="${session.currentUser != null}">
+                                <a th:href="@{/profile/{id}(id=${currentUser.id})}">Profile</a>
+                            </li>
+                            <li><a href="/travels">My Travels</a></li>
+                            <li><a th:href="@{/auth/logout}">Log Out</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main -->
+    <article id="main">
+        <header>
+            <h2>Travel Details</h2>
+
+            <!-- Travel Info -->
+            <p th:if="${travel != null}" th:text="${travel.startPoint + ' to ' + travel.endPoint}"></p>
+            <p th:if="${travel == null}" style="color:red;">Travel information is not available.</p>
+
+            <!-- Driver Information with Link to Profile -->
+            <p th:if="${travel != null}">
+                <strong>Driver:</strong>
+                <a th:href="@{'/profile/' + ${travel.driver.id}}"
+                   th:text="${travel.driver.username}"
+                   style="font-weight: bold; text-decoration: underline;">
+                </a>
+            </p>
+
+            <p th:if="${travel != null}"><strong>Departure Time:</strong> <span th:text="${travel.departureTime}"></span></p>
+            <p th:if="${travel != null}"><strong>Free Spots:</strong> <span th:text="${travel.freeSpots}"></span></p>
+            <p th:if="${travel != null}"><strong>Comment:</strong> <span th:text="${travel.comment}"></span></p>
+        </header>
+
+        <section class="wrapper style5">
+            <div class="inner">
+
+                <!-- Apply for Travel Button (Non-Drivers Only) -->
+                <div th:if="${not isDriver and hasFreeSPorts and not isPassenger}">
+                    <form th:action="@{'/travel/' + ${travel.id} + '/apply'}" method="post">
+                        <input type="submit" value="Apply for Travel" class="button primary" />
+                    </form>
+                </div>
+
+                <!-- Show Edit Travel button if user is the creator -->
+                <div th:if="${isCreator}">
+                    <a th:href="@{'/travel/' + ${travel.id} + '/edit'}" class="button primary">
+                        Edit Travel
+                    </a>
+                </div>
+
+                <!-- Complete and Cancel Travel Buttons (Only for the Driver) -->
+                <div th:if="${isDriver}" style="margin-top: 20px;">
+                    <h3>Manage Travel</h3>
+
+                    <!-- Complete Travel Button -->
+                    <form th:action="@{'/travel/' + ${travel.id} + '/complete'}" method="post" style="display:inline;">
+                        <button type="submit" class="button primary">Complete Travel</button>
+                    </form>
+
+                    <!-- Cancel Travel Button -->
+                    <form th:action="@{'/travel/' + ${travel.id} + '/cancel'}" method="post" style="display:inline;">
+                        <button type="submit" class="button">Cancel Travel</button>
+                    </form>
+                </div>
+
+
+
+                <!-- Passenger List with Approve/Reject Buttons -->
+                <h3>Passengers</h3>
+
+                <!-- Check if User is Driver -->
+                <div th:if="${isDriver}">
+
+                    <!-- Check if Passengers List is Present -->
+                    <ul th:if="${passengers != null and not #lists.isEmpty(passengers)}">
+
+                        <!-- Loop Through Passengers -->
+                        <li th:each="passenger : ${passengers}" style="margin-bottom: 10px;">
+                            <a th:href="@{'/profile/' + ${passenger.user.id}}"
+                               th:text="${passenger.user.username}"
+                               style="font-weight: bold; text-decoration: underline;"></a>
+
+                            <!-- Show Passenger Status -->
+                            <span th:text="'(' + ${passenger.status} + ')'"></span>
+
+                            <!-- Show Approve/Reject only if status is PENDING -->
+                            <div th:if="${passenger.status != null and passenger.status.name() == 'PENDING'}" style="display:inline;">
+
+                                <!-- APPROVE FORM -->
+                                <form th:action="@{'/travel/' + ${travel.id} + '/passengers/' + ${passenger.user.id} + '/approve'}"
+                                      method="post" style="display:inline;">
+                                    <ul class="actions" style="display:inline;">
+                                        <li><input type="submit" value="Approve" class="button primary" /></li>
+                                    </ul>
+                                </form>
+
+                                <!-- REJECT FORM -->
+                                <form th:action="@{'/travel/' + ${travel.id} + '/passengers/' + ${passenger.user.id} + '/reject'}"
+                                      method="post" style="display:inline;">
+                                    <ul class="actions" style="display:inline;">
+                                        <li><input type="submit" value="Reject" class="button" /></li>
+                                    </ul>
+                                </form>
+
+                            </div>
+
+                            <!-- If Not Pending -->
+                            <div th:if="${passenger.status != null and passenger.status.name() == 'PENDING'}">
+                                <p style="color:orange;"></p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <!-- If No Passengers -->
+                    <p th:if="${passengers == null or #lists.isEmpty(passengers)}">No passengers yet.</p>
+                </div>
+
+                <!-- Non-Driver View: Show Approved Passengers Only -->
+                <div th:unless="${isDriver}">
+                    <h3>Approved Passengers</h3>
+                    <ul th:if="${approvedPassengers != null and not #lists.isEmpty(approvedPassengers)}">
+                        <li th:each="passenger : ${approvedPassengers}">
+                            <a th:href="@{'/profile/' + ${passenger.user.id}}"
+                               th:text="${passenger.user.username}"
+                               style="font-weight: bold; text-decoration: underline;">
+                            </a>
+                        </li>
+                    </ul>
+                    <p th:if="${passengers == null or #lists.isEmpty(passengers)}">No passengers yet.</p>
+                </div>
+
+
+                <!-- Non-Driver View: Show Approved Passengers Only -->
+                <div th:unless="${isDriver}">
+                    <h3>Approved Passengers</h3>
+                    <ul th:if="${approvedPassengers != null and not #lists.isEmpty(approvedPassengers)}">
+                        <li th:each="passenger : ${approvedPassengers}">
+                            <a th:href="@{'/profile/' + ${passenger.user.id}}"
+                               th:text="${passenger.user.username}"
+                               style="font-weight: bold; text-decoration: underline;">
+                            </a>
+                        </li>
+                    </ul>
+                    <p th:if="${approvedPassengers == null or #lists.isEmpty(approvedPassengers)}">No approved passengers yet.</p>
+                </div>
+
+            </div>
+        </section>
+    </article>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <ul class="icons">
+            <li><a href="#" class="icon brands fa-twitter">Twitter</a></li>
+            <li><a href="#" class="icon brands fa-facebook-f">Facebook</a></li>
+            <li><a href="#" class="icon brands fa-instagram">Instagram</a></li>
+            <li><a href="#" class="icon brands fa-github">Github</a></li>
+        </ul>
+    </footer>
+
+</div>
+
+<!-- Scripts -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/jquery.scrollex.min.js}"></script>
+<script th:src="@{/js/jquery.scrolly.min.js}"></script>
+<script th:src="@{/js/browser.min.js}"></script>
+<script th:src="@{/js/breakpoints.min.js}"></script>
+<script th:src="@{/js/util.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+
+</body>
+</html>

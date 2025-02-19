@@ -1,0 +1,105 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>Find Rides - Spectral Theme</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <noscript><link rel="stylesheet" th:href="@{/css/noscript.css}" /></noscript>
+</head>
+<body class="is-preload">
+
+<div id="page-wrapper">
+
+    <!-- Header -->
+    <header id="header">
+        <h1><a href="/">Carpooling</a></h1>
+        <nav id="nav">
+            <ul>
+                <li class="special">
+                    <a href="#menu" class="menuToggle"><span>Menu</span></a>
+                    <div id="menu">
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li th:if="${session.currentUser != null}">
+                                <a th:href="@{/profile/{id}(id=${currentUser.id})}">Profile</a>
+                            </li>
+                            <li><a href="/travels">My Travels</a></li>
+                            <li><a href="/find/rides">Find Rides</a></li>
+                            <li><a href="/logout">Log Out</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main -->
+    <article id="main">
+        <header>
+            <h2>Find Rides</h2>
+            <p>Explore active rides or view your own.</p>
+        </header>
+
+        <section class="wrapper style5">
+            <div class="inner">
+
+                <!-- User's Active Rides -->
+                <h3>Your Active Rides</h3>
+                <div th:if="${#lists.isEmpty(userActiveTravels)}">
+                    <p>You haven't created any active rides.</p>
+                </div>
+                <div th:each="travel : ${userActiveTravels}" class="box">
+                    <a th:href="@{'/travel/' + ${travel.id}}" class="button fit">
+                        <strong th:text="${travel.startPoint + ' to ' + travel.endPoint}"></strong>
+                    </a>
+                    <p><strong>Departure:</strong>
+                        <span th:text="${#temporals.format(travel.departureTime, 'dd MMM yyyy, hh:mm a')}"></span>
+                    </p>
+                    <p><strong>Available Seats:</strong> <span th:text="${travel.freeSpots}"></span></p>
+                </div>
+
+                <!-- Separator -->
+                <hr />
+
+                <!-- All Active Rides -->
+                <h3>All Active Rides</h3>
+                <div th:if="${#lists.isEmpty(allActiveTravels)}">
+                    <p>There are currently no active rides available.</p>
+                </div>
+                <div th:each="travel : ${allActiveTravels}" class="box">
+                    <a th:href="@{'/travel/' + ${travel.id}}" class="button fit">
+                        <strong th:text="${travel.startPoint + ' to ' + travel.endPoint}"></strong>
+                    </a>
+                    <p><strong>Departure:</strong>
+                        <span th:text="${#temporals.format(travel.departureTime, 'dd MMM yyyy, hh:mm a')}"></span>
+                    </p>
+                    <p><strong>Available Seats:</strong> <span th:text="${travel.freeSpots}"></span></p>
+                </div>
+
+            </div>
+        </section>
+    </article>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <ul class="icons">
+            <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+            <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+            <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+        </ul>
+    </footer>
+
+</div>
+
+<!-- Scripts -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/jquery.scrollex.min.js}"></script>
+<script th:src="@{/js/jquery.scrolly.min.js}"></script>
+<script th:src="@{/js/browser.min.js}"></script>
+<script th:src="@{/js/breakpoints.min.js}"></script>
+<script th:src="@{/js/util.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+
+</body>
+</html>

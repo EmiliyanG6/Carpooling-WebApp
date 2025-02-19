@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>Create Travel - Spectral Theme</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <noscript><link rel="stylesheet" th:href="@{/css/noscript.css}" /></noscript>
+</head>
+<body class="is-preload">
+
+<div id="page-wrapper">
+
+    <!-- Header -->
+    <header id="header">
+        <h1><a href="/">Carpooling</a></h1>
+        <nav id="nav">
+            <ul>
+                <li class="special">
+                    <a href="#menu" class="menuToggle"><span>Menu</span></a>
+                    <div id="menu">
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li th:if="${session.currentUser != null}">
+                                <a th:href="@{/profile/{id}(id=${currentUser.id})}">Profile</a>
+                            </li>
+                            <li><a href="/travels">My Travels</a></li>
+                            <li><a href="/create-travel">Create Travel</a></li>
+                            <li><a href="/logout">Log Out</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main -->
+    <article id="main">
+        <header>
+            <h2>Create a New Travel</h2>
+            <p>Fill in the details for your upcoming trip.</p>
+        </header>
+        <section class="wrapper style5">
+            <div class="inner">
+
+                <!-- Display Error Message if Present -->
+                <div th:if="${error}" class="box alert">
+                    <p style="color:red;" th:text="${error}"></p>
+                </div>
+
+                <!-- Create Travel Form -->
+                <form th:action="@{/travel/create}" th:object="${travel}" method="post" class="alt">
+                    <div class="row gtr-uniform">
+                        <div class="col-6 col-12-xsmall">
+                            <label for="startPoint">Start Point</label>
+                            <input type="text" id="startPoint" th:field="*{startPoint}" placeholder="Start Point" required>
+                        </div>
+                        <div class="col-6 col-12-xsmall">
+                            <label for="endPoint">End Point</label>
+                            <input type="text" id="endPoint" th:field="*{endPoint}" placeholder="End Point" required>
+                        </div>
+                        <div class="col-6 col-12-xsmall">
+                            <label for="departureTime">Departure Time</label>
+                            <input type="datetime-local" id="departureTime" name="departureTime"
+                                   th:value="${travel.departureTime}" placeholder="Select Departure Time"
+                                   style="color:black; font-weight:bold; border: 1px solid #000; padding: 5px;" required>
+                        </div>
+
+                        <div class="col-6 col-12-xsmall">
+                            <label for="freeSpots">Free Spots</label>
+                            <input type="number" id="freeSpots" name="freeSpots"
+                                   placeholder="Enter Number of Spots"
+                                   style="color:black; font-weight:bold; border: 1px solid #000; padding: 5px;" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="comment">Comment (Optional)</label>
+                            <textarea id="comment" th:field="*{comment}" placeholder="Any special instructions (e.g., no smoking)"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <ul class="actions">
+                                <li><input type="submit" value="Create Travel" class="button primary" /></li>
+                                <li><a href="/" class="button">Cancel</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </article>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <ul class="icons">
+            <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+            <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+            <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+        </ul>
+    </footer>
+
+</div>
+
+<!-- Scripts -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/jquery.scrollex.min.js}"></script>
+<script th:src="@{/js/jquery.scrolly.min.js}"></script>
+<script th:src="@{/js/browser.min.js}"></script>
+<script th:src="@{/js/breakpoints.min.js}"></script>
+<script th:src="@{/js/util.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+
+</body>
+</html>

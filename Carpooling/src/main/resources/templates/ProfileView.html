@@ -24,8 +24,11 @@
                     <div id="menu">
                         <ul>
                             <li><a href="/">Home</a></li>
-                            <li><a href="/profile">Profile</a></li>
-                            <li><a href="/travels">My Travels</a></li>
+                            <li th:if="${session.currentUser != null}">
+                                <a th:href="@{/profile/{id}(id=${user.id})}">Profile</a>
+                            </li>
+                            <li><a href="/find/rides">Find Rides</a></li>
+                            <li th:if="${session.currentUser != null}"><a href="/travel/create">Offer a Ride</a></li>
                             <li><a th:href="@{/auth/logout}">Log Out</a></li>
                         </ul>
                     </div>
@@ -50,23 +53,30 @@
                     <p><strong>Last Name:</strong> <span th:text="${user.lastName}"></span></p>
                     <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
                     <p><strong>Phone:</strong> <span th:text="${user.phoneNumber}"></span></p>
-                    <a th:href="@{/profile/{id}/edit(id=${user.id})}" class="button primary">Edit Profile</a>
+
+                    <!-- Show "Edit Profile" only if the logged-in user is the profile owner -->
+                    <a th:if="${isOwner}" th:href="@{/profile/{id}/edit(id=${user.id})}" class="button primary">
+                        Edit Profile
+                    </a>
                 </div>
 
                 <!-- Active Travels -->
                 <section>
-                    <h2>Your Active Travels</h2>
+                    <h2>Active Travels</h2>
                     <ul class="alt" th:if="${not #lists.isEmpty(activeTravels)}">
                         <li th:each="travel : ${activeTravels}">
                             <a th:href="@{/travel/{id}(id=${travel.id})}" class="button fit">
-                                <span th:text="${travel.startingPoint} + ' to ' + ${travel.endingPoint}"></span>
+                                <strong th:text="${travel.startingPoint} + ' to ' + ${travel.endingPoint}"></strong>
                             </a>
-                            <p>Departure: <span th:text="${#temporals.format(travel.departureTime, 'dd MMM yyyy, hh:mm a')}"></span></p>
+                            <p>Departure:
+                                <span th:text="${#temporals.format(travel.departureTime, 'dd MMM yyyy, hh:mm a')}"></span>
+                            </p>
                             <p>Available Seats: <span th:text="${travel.freeSpots}"></span></p>
                         </li>
                     </ul>
                     <p th:if="${#lists.isEmpty(activeTravels)}">No active travels available.</p>
                 </section>
+
 
                 <!-- Completed Travels -->
                 <section>
@@ -96,18 +106,42 @@
                     <p th:if="${#lists.isEmpty(canceledTravels)}">No canceled travels available.</p>
                 </section>
 
-                <!-- Feedbacks -->
-                <section class="feedback-section">
-                    <h2>Your Feedbacks</h2>
-                    <ul class="alt" th:if="${not #lists.isEmpty(feedbacks)}">
+                <h2>Feedback</h2>
+
+                <!-- Feedback List -->
+                <div th:if="${feedbacks != null and not #lists.isEmpty(feedbacks)}">
+                    <ul th:if="${feedbacks != null and not #lists.isEmpty(feedbacks)}">
                         <li th:each="feedback : ${feedbacks}">
-                            <p>⭐ Rating: <span th:text="${feedback.rating}"></span></p>
-                            <p>💬 Comment: <span th:text="${feedback.comment}"></span></p>
-                            <p>📝 Given By: <span th:text="${feedback.giverUsername}"></span></p>
+                            <strong th:text="${feedback.giverUsername}"></strong>
+                            <span th:text="'rated ' + ${feedback.rating} + ' /5'"></span>
+                            <p th:text="${feedback.comment}"></p>
                         </li>
                     </ul>
-                    <p th:if="${#lists.isEmpty(feedbacks)}">No feedback available.</p>
-                </section>
+
+                    <p th:if="${feedbacks == null or #lists.isEmpty(feedbacks)}">No feedback yet.</p>
+                </div>
+                <p th:if="${feedbacks == null or #lists.isEmpty(feedbacks)}">No feedback yet.</p>
+
+                <!-- Leave Feedback Form -->
+                <div th:if="${session.currentUser != null and session.currentUser != user.username}">
+                    <form th:action="@{'/feedback/' + ${user.id}}" method="post">
+                        <label for="comment">Comment:</label>
+                        <textarea id="comment" name="comment" required></textarea>
+
+                        <label for="rating">Rating:</label>
+                        <select id="rating" name="rating">
+                            <option value="5">Excellent</option>
+                            <option value="4">Good</option>
+                            <option value="3">Okay</option>
+                            <option value="2">Bad</option>
+                            <option value="1">Terrible</option>
+                        </select>
+
+                        <button type="submit">Submit Feedback</button>
+                    </form>
+
+
+                </div>
 
             </div>
         </section>

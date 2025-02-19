@@ -1,5 +1,6 @@
 package com.carpooling.carpooling.repositories;
 
+import com.carpooling.carpooling.enums.PassengerStatus;
 import com.carpooling.carpooling.models.Passenger;
 import com.carpooling.carpooling.models.Travel;
 import com.carpooling.carpooling.models.User;
@@ -18,4 +19,8 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     Optional<Passenger> findByUserAndTravel(User user, Travel travel);
 
     Optional<Passenger> findByUserIdAndTravelId(long userId, long id);
+
+    List<Passenger> findByTravelAndStatus(Travel travel, PassengerStatus passengerStatus);
+
+    Optional<Passenger> findByTravelIdAndUserId(long travelId, long userId);
 }

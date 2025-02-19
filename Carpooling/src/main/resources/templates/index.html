@@ -17,11 +17,13 @@
 					<div id="menu">
 						<ul>
 							<li><a href="/">Home</a></li>
-							<li><a href="/trips">Find Rides</a></li>
-							<li><a href="/offer-ride">Offer a Ride</a></li>
+							<li><a href="/find/rides">Find Rides</a></li>
+							<li th:if="${session.currentUser != null}"><a href="/travel/create">Offer a Ride</a></li>
 							<li th:if="${session.currentUser == null}"><a href="/auth/register">Sign Up</a></li>
 							<li th:if="${session.currentUser == null}"><a href="/auth/login">Log In</a></li>
-							<li th:if="${session.currentUser != null}"><a href="/profile">Profile</a></li>
+							<li th:if="${session.currentUser != null}">
+								<a th:href="@{/profile/{id}(id=${user.id})}">Profile</a>
+							</li>
 							<li th:if="${session.currentUser != null}"><a href="/auth/logout">Logout</a></li>
 						</ul>
 					</div>
@@ -35,8 +37,8 @@
 			<p>Connect with people traveling your way.<br/>
 				Save money, reduce carbon footprint, and enjoy the ride.</p>
 			<ul class="actions special">
-				<li><a href="/trips" class="button primary">Find a Ride</a></li>
-				<li><a href="/offer-ride" class="button">Offer a Ride</a></li>
+				<li><a href="/find/rides" class="button primary">Find a Ride</a></li>
+				<li th:if="${session.currentUser != null}"><a href="/travel/create" class="button">Offer a Ride</a></li>
 			</ul>
 		</div>
 		<a href="#one" class="more scrolly">Learn More</a>

@@ -34,5 +34,24 @@ public interface TravelRepository extends JpaRepository<Travel, Long> {
     Page<Travel> findByDriver(@Param("userId") long userId, Pageable pageable);
 
     List<Travel> findByStatus(TravelStatus status);
+
+
+    @Query("SELECT t FROM Travel t WHERE t.status = 'ACTIVE'")
+    List<Travel> getAllActiveTravels();
+
+
+    @Query("SELECT t FROM Travel t WHERE t.driver.id = :driverId AND t.status = 'ACTIVE'")
+    List<Travel> getActiveTravelsByDriver(long driverId);
+
+    @Query("SELECT t FROM Travel t WHERE t.driver.id = :userId AND t.status = 'ACTIVE'")
+    List<Travel> findActiveTravelsByUserId(@Param("userId") Long userId);
+
+    // Get Completed Travels by User ID
+    @Query("SELECT t FROM Travel t WHERE t.driver.id = :userId AND t.status = 'COMPLETED'")
+    List<Travel> findCompletedTravelsByUserId(@Param("userId") Long userId);
+
+    // Get Canceled Travels by User ID
+    @Query("SELECT t FROM Travel t WHERE t.driver.id = :userId AND t.status = 'CANCELED'")
+    List<Travel> findCanceledTravelsByUserId(@Param("userId") Long userId);
 }
 

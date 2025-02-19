@@ -12,10 +12,6 @@ public class Feedback {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "travel_id", nullable = false)
-    private Travel travel;
-
-    @ManyToOne(optional = false)
     @JoinColumn(name = "giver_id", nullable = false)
     private User giver;
 
@@ -37,13 +33,6 @@ public class Feedback {
         this.id = id;
     }
 
-    public Travel getTravel() {
-        return travel;
-    }
-
-    public void setTravel(Travel travel) {
-        this.travel = travel;
-    }
 
     public User getGiver() {
         return giver;

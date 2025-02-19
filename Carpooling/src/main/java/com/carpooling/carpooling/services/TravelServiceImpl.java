@@ -144,42 +144,65 @@ public class TravelServiceImpl implements TravelService {
         passengerRepository.save(passenger);
     }
 
-    @Override
     public void approvePassenger(long travelId, long userId, User approvingUser) {
         Travel travel = travelRepository.findById(travelId)
-                .orElseThrow(()-> new IllegalArgumentException("Travel not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Travel not found"));
 
-        if (!approvingUser.isAdmin() && travel.getDriver().getId() != approvingUser.getId()) {
-            throw new IllegalArgumentException("You are not authorized to approve passengers.");
+        if (!travel.getDriver().equals(approvingUser)) {
+            throw new SecurityException("Only the driver can approve passengers.");
         }
 
-        Passenger passenger = passengerRepository.findByUserIdAndTravelId(userId, travelId)
-                .orElseThrow(()-> new IllegalArgumentException("Passenger not found"));
+        Passenger passenger = passengerRepository.findByTravelIdAndUserId(travelId, userId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Passenger not found for travel " + travelId + " and user " + userId));
 
-        if (travel.getFreeSpots() <= 0){
-            throw new IllegalArgumentException("You are not authorized to approve passengers.");
+        if (!passenger.getTravel().getId().equals(travel.getId())) {
+            throw new IllegalStateException("Passenger " + userId + " is not part of travel " + travelId);
         }
+
+        if (travel.getFreeSpots() <= 0) {
+            throw new IllegalStateException("No free spots available");
+        }
+
         passenger.setStatus(PassengerStatus.APPROVED);
-        travel.setFreeSpots(travel.getFreeSpots() - 1);
-
         passengerRepository.save(passenger);
+
+        travel.setFreeSpots(travel.getFreeSpots() - 1);
         travelRepository.save(travel);
 
+        if (travel.getFreeSpots() == 0) {
+            List<Passenger> pendingPassengers = passengerRepository.findByTravelAndStatus(travel, PassengerStatus.PENDING);
+            for (Passenger pending : pendingPassengers) {
+                pending.setStatus(PassengerStatus.REJECTED);
+            }
+            passengerRepository.saveAll(pendingPassengers);
+        }
     }
+
 
     @Override
     public void rejectPassenger(long travelId, long userId, User aprovingUser) {
         Travel travel = travelRepository.findById(travelId)
-                .orElseThrow(()-> new IllegalArgumentException("Travel not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Travel not found"));
 
-        if (!aprovingUser.isAdmin() && travel.getDriver().getId() != aprovingUser.getId()) {
-            throw new IllegalArgumentException("You are not authorized to reject passengers.");
+        if (!travel.getDriver().equals(aprovingUser)) {
+            throw new SecurityException("Only the driver can reject passengers.");
         }
-        Passenger passenger = passengerRepository.findByUserIdAndTravelId(userId,travelId)
-                .orElseThrow(()-> new IllegalArgumentException("Passenger not found"));
+
+        Passenger passenger = passengerRepository.findByTravelIdAndUserId(travelId, userId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Passenger not found for travel " + travelId + " and user " + userId));
+
+        if (!passenger.getTravel().getId().equals(travel.getId())) {
+            throw new IllegalStateException("Passenger " + userId + " is not part of travel " + travelId);
+        }
+
+        if (passenger.getStatus() != PassengerStatus.PENDING) {
+            throw new IllegalStateException("Only pending passengers can be rejected.");
+        }
 
         passenger.setStatus(PassengerStatus.REJECTED);
-        passengerRepository.delete(passenger);
+        passengerRepository.save(passenger);
     }
 
     @Override
@@ -223,7 +246,6 @@ public class TravelServiceImpl implements TravelService {
             throw new IllegalArgumentException("You are not authorized to leave feedback.");
         }
         Feedback feedback = new Feedback();
-        feedback.setTravel(travel);
         feedback.setGiver(giver);
         feedback.setReceiver(receiver);
         feedback.setRating(feedbackDto.getRating());
@@ -255,16 +277,28 @@ public class TravelServiceImpl implements TravelService {
                 .toList();
     }
     @Override
-    public List<Travel> getActiveTravels() {
-        return travelRepository.findByStatus(TravelStatus.ACTIVE);
+    public List<Travel> getActiveTravelsByUser(Long userId) {
+        return travelRepository.findActiveTravelsByUserId(userId);
     }
+
     @Override
-    public List<Travel> getCompletedTravels() {
-        return travelRepository.findByStatus(TravelStatus.COMPLETED);
+    public List<Travel> getCompletedTravelsByUser(Long userId) {
+        return travelRepository.findCompletedTravelsByUserId(userId);
     }
+
     @Override
-    public List<Travel> getCanceledTravels() {
-        return travelRepository.findByStatus(TravelStatus.CANCELED);
+    public List<Travel> getCanceledTravelsByUser(Long userId) {
+        return travelRepository.findCanceledTravelsByUserId(userId);
+    }
+
+    @Override
+    public List<Travel> getActiveTravelsByDriver(long driverId) {
+        return travelRepository.getActiveTravelsByDriver(driverId);
+    }
+
+    @Override
+    public List<Travel> getAllActiveTravels() {
+        return travelRepository.getAllActiveTravels();
     }
 
     private void checkModifyPermissions(long travelId, User user) {

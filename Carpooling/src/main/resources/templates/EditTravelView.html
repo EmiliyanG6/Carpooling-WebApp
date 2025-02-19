@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>Edit Travel - Spectral Theme</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <noscript><link rel="stylesheet" th:href="@{/css/noscript.css}" /></noscript>
+</head>
+<body class="is-preload">
+
+<div id="page-wrapper">
+
+    <!-- Header -->
+    <header id="header">
+        <h1><a href="/">Carpooling</a></h1>
+        <nav id="nav">
+            <ul>
+                <li class="special">
+                    <a href="#menu" class="menuToggle"><span>Menu</span></a>
+                    <div id="menu">
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li th:if="${currentUser != null}">
+                                <a th:href="@{/profile/{id}(id=${currentUser.id})}">Profile</a>
+                            </li>
+                            <li><a href="/travel">My Travels</a></li>
+                            <li><a href="/auth/logout">Log Out</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main -->
+    <article id="main">
+        <header>
+            <h2>Edit Travel</h2>
+            <p>Update your travel details below.</p>
+        </header>
+        <section class="wrapper style5">
+            <div class="inner">
+
+                <!-- Show Messages (Errors/Success) -->
+                <div th:if="${error}" style="background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+                    <strong>Error:</strong> <span th:text="${error}"></span>
+                </div>
+
+                <!-- Show Success Message if Exists -->
+                <div th:if="${success}" style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+                    <strong>Success:</strong> <span th:text="${success}"></span>
+                </div>
+
+                <!-- Travel Edit Form -->
+                <form th:action="@{'/travel/' + ${travel.id} + '/edit'}" th:object="${travel}" method="post">
+                    <div class="row gtr-uniform">
+                        <div class="col-6 col-12-xsmall">
+                            <label for="startingPoint">Starting Point</label>
+                            <input type="text" id="startingPoint" th:field="*{startingPoint}" placeholder="Starting Point" required>
+                        </div>
+                        <div class="col-6 col-12-xsmall">
+                            <label for="endingPoint">Ending Point</label>
+                            <input type="text" id="endingPoint" th:field="*{endingPoint}" placeholder="Ending Point" required>
+                        </div>
+                        <div class="col-6 col-12-xsmall">
+                            <label for="departureTime">Departure Time</label>
+                            <input type="datetime-local" id="departureTime" name="departureTime"
+                                   th:value="${travel.departureTime != null ? #temporals.format(travel.departureTime, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                                   style="color:black; font-weight:bold; border: 1px solid #000; padding: 5px;" required>
+                        </div>
+                        <div class="col-6 col-12-xsmall">
+                            <label for="freeSpots">Free Spots</label>
+                            <input type="number" id="freeSpots" th:field="*{freeSpots}" min="1" placeholder="Enter Number of Spots"
+                                   style="color:black; font-weight:bold; border: 1px solid #000; padding: 5px;" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="comment">Comment</label>
+                            <textarea id="comment" th:field="*{comment}" placeholder="Add a comment (Optional)"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <ul class="actions">
+                                <li><input type="submit" value="Update Travel" class="button primary" /></li>
+                                <li><a th:href="@{'/travel/' + ${travel.id}}" class="button">Cancel</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </section>
+    </article>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <ul class="icons">
+            <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+            <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+            <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+            <li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
+        </ul>
+    </footer>
+
+</div>
+
+<!-- Scripts -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/jquery.scrollex.min.js}"></script>
+<script th:src="@{/js/jquery.scrolly.min.js}"></script>
+<script th:src="@{/js/browser.min.js}"></script>
+<script th:src="@{/js/breakpoints.min.js}"></script>
+<script th:src="@{/js/util.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+
+</body>
+</html>

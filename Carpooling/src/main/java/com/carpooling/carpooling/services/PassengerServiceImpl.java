@@ -1,5 +1,6 @@
 package com.carpooling.carpooling.services;
 
+import com.carpooling.carpooling.enums.PassengerStatus;
 import com.carpooling.carpooling.models.Passenger;
 import com.carpooling.carpooling.models.Travel;
 import com.carpooling.carpooling.repositories.PassengerRepository;
@@ -26,13 +27,12 @@ public class PassengerServiceImpl implements PassengerService {
         Travel travel = travelRepository.findById(travelId)
                 .orElseThrow(() -> new IllegalArgumentException("Travel not found"));
 
-        if (travel.getFreeSpots() <= 0){
-            throw new IllegalStateException("No free sports available for this travel");
+        if (travel.getFreeSpots() <= 0) {
+            throw new IllegalStateException("No free spots available for this travel");
         }
-        passenger.setTravel(travel);
-        travel.setFreeSpots(travel.getFreeSpots()-1);
-        travelRepository.save(travel);
 
+        passenger.setTravel(travel);
+        passenger.setStatus(PassengerStatus.PENDING);
         return passengerRepository.save(passenger);
     }
 

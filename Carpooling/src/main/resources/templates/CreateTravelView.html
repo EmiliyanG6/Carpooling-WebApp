@@ -22,8 +22,7 @@
                         <ul>
                             <li><a href="/">Home</a></li>
                             <li th:if="${session.currentUser != null}">
-                                <a th:href="@{/profile/{id}(id=${currentUser.id})}">Profile</a>
-                            </li>
+                                <a th:href="@{/profile/{id}(id=${currentUser.id})}">Profile</a></li>
                             <li><a href="/create-travel">Create Travel</a></li>
                             <li><a href="/logout">Log Out</a></li>
                         </ul>

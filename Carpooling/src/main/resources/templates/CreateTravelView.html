@@ -24,7 +24,6 @@
                             <li th:if="${session.currentUser != null}">
                                 <a th:href="@{/profile/{id}(id=${currentUser.id})}">Profile</a>
                             </li>
-                            <li><a href="/travels">My Travels</a></li>
                             <li><a href="/create-travel">Create Travel</a></li>
                             <li><a href="/logout">Log Out</a></li>
                         </ul>

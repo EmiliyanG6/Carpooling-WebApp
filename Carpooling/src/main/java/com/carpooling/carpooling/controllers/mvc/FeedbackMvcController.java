@@ -3,10 +3,8 @@ package com.carpooling.carpooling.controllers.mvc;
 import com.carpooling.carpooling.helpers.AuthenticationHelper;
 import com.carpooling.carpooling.models.Dtos.FeedbackDto;
 import com.carpooling.carpooling.models.Feedback;
-import com.carpooling.carpooling.models.Travel;
 import com.carpooling.carpooling.models.User;
 import com.carpooling.carpooling.services.interfaces.FeedbackService;
-import com.carpooling.carpooling.services.interfaces.TravelService;
 import com.carpooling.carpooling.services.interfaces.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @Controller
 @RequestMapping("/feedback")
